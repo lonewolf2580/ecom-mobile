@@ -12,7 +12,7 @@ export default function ProductList({ product }: { product: any }) {
             params: { id: product.id}
         }} asChild>
             <Pressable className='flex-1'>
-                <Card className="p-5 rounded-lg max-w-[360px] flex-1">
+                <Card className="p-5 rounded-lg flex-1">
                 <Image
                     source={{
                     uri: product.image,
