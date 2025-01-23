@@ -1,11 +1,16 @@
-import { FlatList, useWindowDimensions, View } from "react-native";
-import products from '@/assets/products.json'
+import { ActivityIndicator, FlatList } from "react-native";
+// import products from '@/assets/products.json'
 import ProductList from "@/components/productListItem";
 import { useBreakpointValue } from "@/components/ui/utils/use-break-point-value";
+import { listProducts } from "@/api/products";
+import { useQuery } from "@tanstack/react-query";
+import { Text } from "@/components/ui/text";
 
 export default function HomeScreen() {
-  // const { width } = useWindowDimensions()
-  // const numColums = width > 700 ? 4 : 2
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['products'], 
+    queryFn: listProducts
+  })
 
   const numColumns = useBreakpointValue({
     default: 2,
@@ -13,18 +18,23 @@ export default function HomeScreen() {
     xl: 4
   })
 
+  if (isLoading) {
+    return <ActivityIndicator />
+  }
+
+  if(error) {
+    return <Text>Error fetching products</Text>
+  }
+
   return (
-    <View>
-      <FlatList 
-        key={numColumns}
-        data={products} 
-        numColumns={numColumns}
-        contentContainerClassName="gap-2 max-w-[960px] mx-auto w-full"
-        columnWrapperClassName="gap-2"
-        renderItem={({item})=> {
-        return <ProductList product={item} />
-      }} />
-      
-    </View>
+    <FlatList 
+      key={numColumns}
+      data={data} 
+      numColumns={numColumns}
+      contentContainerClassName="gap-2 max-w-[960px] mx-auto w-full"
+      columnWrapperClassName="gap-2"
+      renderItem={({item})=> {
+      return <ProductList product={item} />
+    }} />
   );
 }

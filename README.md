@@ -1,50 +1,81 @@
-# Welcome to your Expo app 👋
+# Web3 Multivendor E-commerce Platform
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A decentralized multivendor e-commerce platform built with blockchain technology, enabling sellers to list products and buyers to securely transact using cryptocurrencies. The platform includes a **React Native mobile app**, a **Next.js dashboard** for admins and sellers, and **Solidity smart contracts** for payment and order management.
 
-## Get started
+---
 
-1. Install dependencies
+## 🚀 Features
 
-   ```bash
-   npm install
-   ```
+### General Features
+- **Decentralized Payments**: Secure cryptocurrency payments with an escrow system.
+- **Product Listings**: Vendors can list products with descriptions, prices, and images.
+- **Order Management**: Real-time order tracking for buyers and sellers.
+- **Commission System**: Dynamic admin commission fees per transaction.
+- **Ratings & Reviews**: Buyers can review products.
+- **KYC Verification**: Sellers must pass KYC for onboarding.
 
-2. Start the app
+### Mobile App Features (React Native)
+- User Registration/Login (via WalletConnect).
+- Browse products by categories.
+- Add to Cart & Wishlist.
+- Secure Checkout with Crypto Wallet.
+- Real-time Order Tracking.
+- Push Notifications for Offers & Updates.
 
-   ```bash
-    npx expo start
-   ```
+### Admin Features (Next.js)
+- Manage Users (Sellers & Buyers).
+- Seller Approval & KYC Verification.
+- View Platform Revenue & Analytics.
+- Manage Dispute Resolution.
 
-In the output, you'll find options to open the app in a
+### Seller Dashboard Features (Next.js)
+- Manage Products (Add, Update, Delete).
+- View & Process Orders.
+- Earnings Dashboard with Withdrawal Option.
+- Access Seller-Specific Analytics.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+---
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## 🛠️ Tech Stack
 
-## Get a fresh project
+### Frontend
+- **Mobile App**: React Native
+- **Admin & Seller Dashboard**: Next.js
 
-When you're ready, run:
+### Blockchain
+- **Smart Contracts**: Solidity (Ethereum-compatible networks like Polygon)
 
-```bash
-npm run reset-project
-```
+### Backend Services
+- **APIs**: Node.js & Express
+- **Real-Time Database**: Firebase
+- **Decentralized Storage**: IPFS (for product images)
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Wallet Integration
+- MetaMask (Admin & Sellers on desktop)
+- WalletConnect (Mobile users)
 
-## Learn more
+### Deployment
+- **Smart Contracts**: Deployed on Ethereum-compatible blockchain (e.g., Polygon)
+- **Frontend**: 
+  - Vercel (Next.js)
+  - Expo (React Native)
 
-To learn more about developing your project with Expo, look at the following resources:
+---
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+## 🏗️ Architecture
 
-## Join the community
+![Architecture Diagram](path/to/architecture-diagram.png)
 
-Join our community of developers creating universal apps.
+1. **Frontend**: React Native app for customers and Next.js dashboards for admin and sellers.
+2. **Smart Contracts**: Manage payments, orders, and vendor relationships.
+3. **Backend Services**: APIs for syncing real-time data and facilitating blockchain interactions.
+4. **Database**: Firebase for metadata and IPFS for decentralized file storage.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+---
+
+## 📜 Smart Contract Details
+
+### Key Functionalities
+- **Product Listing**:
+  ```solidity
+  function addProduct(string memory name, uint price, string memory imageHash, address seller) public;

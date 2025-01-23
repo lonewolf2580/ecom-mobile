@@ -1,23 +1,31 @@
 import { Text } from "@/components/ui/text";
 import { Stack, useLocalSearchParams } from "expo-router";
-import products from '@/assets/products.json'
+// import products from '@/assets/products.json'
 import { Card } from "@/components/ui/card";
 import { VStack } from '@/components/ui/vstack';
 import { Image } from '@/components/ui/image';
 import { Heading } from '@/components/ui/heading';
 import { Box } from '@/components/ui/box';
 import { Button, ButtonText } from '@/components/ui/button';
+import { fetchProductById } from "@/api/products";
+import { useQuery } from "@tanstack/react-query";
+import { ActivityIndicator } from "react-native";
 
 const ProductDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams()
 
-  const product = products.find((p) => {
-    return p.id == Number(id);
+  const { data: product, isLoading, error } = useQuery({
+    queryKey: ['products', id], 
+    queryFn: ()=> fetchProductById(Number(id)),
   })
 
-  if (!product) {
-    return <Text>Product not found</Text>;
-  }
+  if (isLoading) {
+      return <ActivityIndicator />
+    }
+  
+    if(error) {
+      return <Text>Product not found</Text>
+    }
 
   return (
     <Box className="flex-1 items-center p-3">
