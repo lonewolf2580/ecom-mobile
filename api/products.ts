@@ -10,6 +10,7 @@ export async function listProducts() {
         return json;
     } catch (error) {
         console.error(error);
+        throw Error('Failed to fetch products')
     }
 }
 
@@ -23,5 +24,6 @@ export async function fetchProductById(id: number) {
         return json;
     } catch (error) {
         console.error(error);
+        throw Error('Failed to fetch product')
     }
 }

@@ -1,0 +1,208 @@
+import { getAuthUserId } from "@convex-dev/auth/server";
+import { mutation, query } from "./_generated/server";
+import { getAuthSessionId } from "@convex-dev/auth/server";
+import { v } from "convex/values";
+ 
+export const currentSession = query({
+  args: {},
+  handler: async (ctx) => {
+    const sessionId = await getAuthSessionId(ctx);
+    if (sessionId === null) {
+      return null;
+    }
+    return await ctx.db.get(sessionId);
+  },
+});
+ 
+export const currentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const userId = await getAuthUserId(ctx);
+    if (userId === null) {
+      return null;
+    }
+    return await ctx.db.get(userId);
+  },
+});
+
+export const updateUser = mutation({
+  args: {
+    id: v.id('users'),
+    name: v.string(),
+    phone: v.optional(v.string()),
+    address: v.optional(v.string()),
+    about: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      name: args.name,
+      phone: args.phone,
+      address: args.address,
+      about: args.about,
+    })
+    console.log(ctx.db.get(args.id));
+    return ctx.db.get(args.id);
+  }
+})
+
+export const updateUserImage = mutation({
+  args: {
+    id: v.id('users'),
+    image: v.string(),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, {
+      image: args.image
+    })
+    console.log(ctx.db.get(args.id));
+    return ctx.db.get(args.id);
+  }
+})
+
+// Get Sellers
+export const getSellers = query({
+  args: {},
+  handler: async (ctx, args) => {
+      const users = (await ctx.db.query("users").collect()).filter((user) => user.role === "seller")
+      return users
+  }
+})
+
+// Add to Cart
+// export const addToCart = mutation({
+//   args: {
+//     id: v.id('users'),
+//     product: v.object({
+//       productId: v.string(),
+//       name: v.string(),
+//       quantity: v.number(),
+//       price: v.number(),
+//       seller: v.string()
+//     }),
+//   },
+//   handler: async (ctx, args) => {
+//     const userId = await getAuthUserId(ctx);
+//     if (userId === null) {
+//       return null;
+//     }
+//     const user = await ctx.db.get(userId);
+//     if(user?.cart?.find((product)=> product == args.product)){
+//       for (let i = 0; i < user?.cart.length; i++) {
+//         const element = user?.cart[i];
+//         if (element.productId == args.product.productId) {
+//           user.cart[i].quantity += args.product.quantity
+//           break
+//         }
+//       }
+//     }else{
+//       user?.cart?.push(args.product)
+//     }
+//     await ctx.db.patch(args.id, {
+//       cart: user?.cart,
+//     })
+//     console.log(ctx.db.get(args.id));
+//     return ctx.db.get(args.id);
+//   }
+// })
+
+// Product Functions
+export const createProduct = mutation({
+  args: {
+    name: v.string(),
+    description: v.string(),
+    image: v.string(),
+    price: v.number(),
+    // quantity: v.number(),
+    seller: v.string()
+  },
+  handler: async (ctx, args) => {
+      await ctx.db.insert("products", {
+          name: args.name,
+          description: args.description,
+          image: args.image,
+          price: args.price,
+          // quantity: args.quantity,
+          seller: args.seller
+      })
+  }
+})
+
+export const getProducts = query({
+  args: {},
+  handler: async (ctx) => {
+      const products = await ctx.db.query("products").order("desc").take(50)
+      return products.reverse()
+  }
+})
+
+export const getProductById = query({
+  args: {
+    id: v.id('products')
+  },
+  handler: async (ctx, args) => {
+      const product = (await ctx.db.query("products").collect()).find((product) => product._id === args.id)
+      return product
+  }
+})
+
+export const getProductsBySellerEmail = query({
+  args: {
+    email: v.string()
+  },
+  handler: async (ctx, args) => {
+      const products = (await ctx.db.query("products").withIndex("seller", (q)=> q.eq("seller", args.email)).collect())
+      return products
+  }
+})
+
+// Order Functions
+export const createOrder = mutation({
+  args: {
+    user: v.string(),
+    products: v.array(v.object({
+        productId: v.string(),
+        name: v.string(),
+        quantity: v.number(),
+        price: v.number(),
+        seller: v.string()
+    }))
+  },
+  handler: async (ctx, args) => {
+      await ctx.db.insert("orders", {
+          user: args.user,
+          products: args.products,
+      })
+  }
+})
+
+export const getOrders = query({
+  args: {},
+  handler: async (ctx) => {
+      const orders = await ctx.db.query("orders").order("desc").take(50)
+      return orders.reverse()
+  }
+})
+
+export const getOrderById = query({
+  args: {
+    id: v.id('orders')
+  },
+  handler: async (ctx, args) => {
+      const order = (await ctx.db.query("orders").collect()).find((order) => order._id === args.id)
+      return order
+  }
+})
+
+export const getOrdersByUserEmail = query({
+  args: {
+    email: v.string()
+  },
+  handler: async (ctx, args) => {
+      const orders = await ctx.db.query("orders").withIndex("user", (q)=> q.eq("user", args.email)).collect()
+      return orders
+  }
+})
+
+export const generateUploadUrl = mutation(async (ctx) => {
+  return await ctx.storage.generateUploadUrl();
+});

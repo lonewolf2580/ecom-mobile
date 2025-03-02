@@ -1,54 +1,50 @@
-import { Button, ButtonText } from "@/components/ui/button";
-import { FormControl } from "@/components/ui/form-control";
-import { Heading } from "@/components/ui/heading";
-import { Input, InputField, InputIcon, InputSlot } from "@/components/ui/input";
-import { Text } from "@/components/ui/text";
-import { VStack } from "@/components/ui/vstack";
-import { EyeIcon, EyeOffIcon } from "@/components/ui/icon";
+import { useAuthActions } from "@convex-dev/auth/react";
+import { Authenticated, Unauthenticated } from "convex/react";
+import { Redirect } from "expo-router";
 import { useState } from "react";
-import { HStack } from "@/components/ui/hstack";
-	
-export default function LoginScreen() {
-          const [showPassword, setShowPassword] = useState(false);
+import { Button, TextInput, View } from "react-native";
+ 
+export default function SignIn() {
+  const { signIn } = useAuthActions();
+  const [step, setStep] = useState<"signUp" | "signIn">("signIn");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  return (
+    <>
+    <Unauthenticated>
+      <View className="flex-1 justify-center p-4 bg-gray-100">
+        <TextInput
+        className="mb-4 p-2 border border-gray-300 rounded"
+        placeholder="Email"
+        onChangeText={setEmail}
+        value={email}
+        inputMode="email"
+        autoCapitalize="none"
+        />
+        <TextInput
+        className="mb-4 p-2 border border-gray-300 rounded"
+        placeholder="Password(Alphanumeric, 8+ characters)"
+        onChangeText={setPassword}
+        value={password}
+        secureTextEntry
+        />
+        <Button
+        title={step === "signIn" ? "Sign in" : "Sign up"}
+        onPress={() => {
+          void signIn("password", { email, password, flow: step });
+        }}
+        />
+        
+        <Button
+        title={step === "signIn" ? "Don't have an Account? Sign up" : "Already Have an Account? Sign in"}
+        onPress={() => setStep(step === "signIn" ? "signUp" : "signIn")}
+        />
+      </View>
+    </Unauthenticated>
 
-          const handleState = () => {
-            setShowPassword((showState) => {
-              return !showState;
-            });
-          };
-
-          return (
-            <FormControl className="p-4 border rounded-lg max-w-[500px] border-outline-300 bg-white m-2">
-              <VStack space="xl">
-                <Heading className="text-typography-900 pt-3">Login</Heading>
-                <VStack space="xs">
-                  <Text className="text-typography-500">Email</Text>
-                  <Input className="min-w-[250px]">
-                    <InputField type="text" />
-                  </Input>
-                </VStack>
-                <VStack space="xs">
-                  <Text className="text-typography-500">Password</Text>
-                  <Input className="text-center">
-                    <InputField type={showPassword ? "text" : "password"} />
-                    <InputSlot className="pr-3" onPress={handleState}>
-                      <InputIcon
-                        as={showPassword ? EyeIcon : EyeOffIcon}
-                      />
-                    </InputSlot>
-                  </Input>
-                </VStack>
-                <HStack space="sm">
-                    <Button className="flex-1" variant="outline">
-                        <ButtonText>Register</ButtonText>
-                    </Button>
-
-                    <Button className="flex-1">
-                        <ButtonText>Login</ButtonText>
-                    </Button>
-                </HStack>
-                
-              </VStack>
-            </FormControl>
-          );
-        }
+    <Authenticated>
+        <Redirect href={'/'} />
+    </Authenticated>
+    </>
+  );
+}

@@ -15,7 +15,7 @@ export default function ProductList({ product }: { product: any }) {
                 <Card className="p-5 rounded-lg flex-1">
                 <Image
                     source={{
-                    uri: `https://pastel-chinchilla-353.convex.site/getImage?storageId=${product.image}`,
+                    uri: `${process.env.CONVEX_SITE_URL}/getImage?storageId=${product.image}`,
                     }}
                     className="mb-6 h-[240px] w-full rounded-md aspect-[4/3]"
                     alt={`${product.name} image`}
@@ -25,10 +25,22 @@ export default function ProductList({ product }: { product: any }) {
                     {product.name}
                 </Text>
                     <Heading size="md" className="mb-4">
-                    ${product.price.toLocaleString()}
+                    ${product.price}
                     </Heading>
                 </Card>
             </Pressable>
         </Link>
     )
   }
+//   {products.map((product, index) => {
+//                 // product.image = image(product.image);
+//                 return (
+//                   <View key={index} className='bg-white rounded-lg p-5'>
+//                     <Text style={{ fontWeight: 'bold' }}>{product.name}</Text>
+//                     <Text>{product.description}</Text>
+//                     <Image src={'https://pastel-chinchilla-353.convex.site/getImage?storageId='+product.image} source={'https://pastel-chinchilla-353.convex.site/getImage?storageId='+product.image} style={{ width: 100, height: 100 }} />
+//                     <Text>${product.price}</Text>
+//                   </View>
+//                 );
+//               })}
+  
