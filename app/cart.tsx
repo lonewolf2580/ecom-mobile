@@ -8,7 +8,7 @@ import { Redirect, router } from "expo-router";
 import { Heading } from "@/components/ui/heading";
 import { Image } from "@/components/ui/image";
 import { useState } from "react";
-import Checkout from "./checkout";
+// import Checkout from "./checkout";
 import { useMutation, useQuery } from "convex/react";
 import { api } from '@/convex/_generated/api';
 import { Id } from '@/convex/_generated/dataModel';
@@ -99,7 +99,6 @@ export default function CartScreen() {
           {!checkout &&<Button onPress={onCheckout} className="w-full p-3 bg-primary-500">
           <ButtonText>Checkout ${total.toLocaleString()}</ButtonText>
         </Button>}
-        {checkout && <Checkout total={total} />}
         </>
       )}
     />
