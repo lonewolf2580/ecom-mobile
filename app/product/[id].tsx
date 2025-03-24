@@ -15,24 +15,14 @@ import { useEffect, useState } from "react";
 import { useQuery } from "convex/react";
 import { api } from '@/convex/_generated/api';
 import { Id } from "@/convex/_generated/dataModel";
-import {
-  Select,
-  SelectTrigger,
-  SelectInput,
-  SelectIcon,
-  SelectPortal,
-  SelectBackdrop,
-  SelectContent,
-  SelectDragIndicator,
-  SelectDragIndicatorWrapper,
-  SelectItem,
-} from "@/components/ui/select"
-import { ChevronDownIcon } from "@/components/ui/icon"
+import { Input, InputField } from "@/components/ui/input";
+import { HStack } from "@/components/ui/hstack";
 
 const ProductDetailsScreen = () => {
   const { id } = useLocalSearchParams()
   const [isLoading, setIsLoading] = useState(true)
-  const [quantity, setQuantity] = useState(1)
+  const [inCart, setInCart] = useState(false)
+  const [quantity, setQuantity] = useState("1")
   const product = useQuery(api.userFunctions.getProductById, {id: id as Id<"products">});
 
   const addProduct = useCart((state: any) => state.addProduct)
@@ -43,6 +33,10 @@ const ProductDetailsScreen = () => {
       setIsLoading(false)
     }
   }, [product])
+
+  if (product && cartItems.find((item: any)=> item.name == product?.name)) {
+    setInCart(true)
+  }
 
   const addToCart = () => {
     addProduct(product, quantity)
@@ -82,34 +76,22 @@ const ProductDetailsScreen = () => {
           <Text size="sm">
             {product?.description}
           </Text>
+          <HStack space="2xl">
+            <Text bold size="2xl">Quantity</Text>
+            <Input
+              variant="outline"
+              size="md"
+              isDisabled={false}
+              isInvalid={false}
+              isReadOnly={false}
+            >
+              <InputField placeholder="Enter Quantity you want to purchase" value={quantity} onChangeText={(text)=> setQuantity(text)} />
+            </Input>
+          </HStack>
         </VStack>
-        <Select onValueChange={(value)=> setQuantity(value)}>
-          <SelectTrigger variant="rounded" size="sm">
-            <SelectInput placeholder="Select Quantity" />
-            <SelectIcon className="mr-3" as={ChevronDownIcon} />
-          </SelectTrigger>
-          <SelectPortal>
-            <SelectBackdrop />
-            <SelectContent>
-              <SelectDragIndicatorWrapper>
-                <SelectDragIndicator />
-              </SelectDragIndicatorWrapper>
-              <SelectItem label="1" value="1" />
-              <SelectItem label="2" value="2" />
-              <SelectItem
-                label="5"
-                value="5"
-              />
-              <SelectItem label="10" value="10" isDisabled={true} />
-              <SelectItem label="20" value="20" />
-              <SelectItem label="50" value="50" />
-              <SelectItem label="100" value="100" />
-            </SelectContent>
-          </SelectPortal>
-        </Select>
         <Box className="flex-col sm:flex-row">
-          <Button onPress={addToCart} className="px-4 py-2 mr-0 mb-3 sm:mr-3 sm:mb-0 sm:flex-1">
-            <ButtonText size="sm">Add to cart</ButtonText>
+          <Button disabled={inCart} onPress={addToCart} className="px-4 py-2 mr-0 mb-3 sm:mr-3 sm:mb-0 sm:flex-1">
+            <ButtonText size="sm">{inCart? "Already in Cart" : "Add to cart"}</ButtonText>
           </Button>
           {/* <Button
             variant="outline"

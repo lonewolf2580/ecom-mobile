@@ -6,6 +6,10 @@ import dayjs from "dayjs";
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { Id } from '@/convex/_generated/dataModel';
 import { Image } from '@/components/ui/image';
+import * as ImagePicker from 'expo-image-picker';
+import { Camera } from 'lucide-react-native';
+import { Icon } from '@/components/ui/icon';
+import { ButtonText } from '@/components/ui/button';
 
 dayjs.extend(relativeTime);
 
@@ -19,11 +23,52 @@ export default function Profile() {
   const [updated, setUpdated] = useState(false)
   const [uploaded, setUploaded] = useState(false)
   const [uploading, setUploading] = useState(false)
-  
+   
   const userData = useQuery(api.userFunctions.currentUser);
   const updateUserData = useMutation(api.userFunctions.updateUser);
   const generateUploadUrl = useMutation(api.userFunctions.generateUploadUrl);
   const updateUserImage = useMutation(api.userFunctions.updateUserImage);
+
+  const pickImageAsync = async () => {
+      let result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        quality: 1,
+      });
+  
+      if (!result.canceled) {
+        // setImage(result.assets[0].uri);
+        console.log(result.assets[0]);
+        setUploading(true)
+        const file = result.assets[0]
+        
+        if (file) {
+          // Upload Image
+          const postUrl = await generateUploadUrl()
+          console.log(postUrl);
+          
+          const response = await fetch(file.uri);
+          const blob = await response.blob();
+          const result = await fetch(postUrl, {
+            method: "POST",
+            headers: { "Content-Type": blob.type },
+            body: blob,
+          });
+          const { storageId } = await result.json();
+          console.log(storageId);
+          
+          updateUserImage({
+            id: userData?._id as Id<"users">,
+            image: storageId
+          })
+          setImage(storageId)
+        }
+        setUploading(false)
+        setUploaded(true)
+      } else {
+        alert('You did not select any image.');
+      }
+  }
 
   const uploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
       setUploading(true)
@@ -70,24 +115,25 @@ export default function Profile() {
         <Text style={{ fontSize: 35, fontWeight: 'bold', alignSelf:'center', marginBottom: 20 }}>{userData?.role == 'seller' && "Seller Account"}</Text>
 
         {userData?.image ?<View className='w-full flex items-center justify-center'>
-          <Image source={'https://pastel-chinchilla-353.convex.site/getImage?storageId='+userData?.image} className='w-[200px] h-[200px] rounded-full' />
+          <Image source={'https://pastel-chinchilla-353.convex.site/getImage?storageId='+userData?.image} className='w-[200px] h-[200px] rounded-full' alt={userData?.name} />
         </View>
         :
-        <View className="w-full mb-2.5">
-          <Text>Image Upload</Text>
-          <input type='file' onChange={uploadImage} />
-                {uploading && <ActivityIndicator  />}
-        </View>}
-
+        <View style={{
+            alignItems: 'center',
+            margin: 0
+          }}>
+            <Button title='Choose a photo' onPress={pickImageAsync} />
+            {uploading && <ActivityIndicator />}
+        </View>
+        }
+      
+      <>
         <Text style={{ fontSize: 24, fontWeight: 'bold' }}>{userData?.name}</Text>
         <Text style={{ fontSize: 18, color: 'gray' }}>{userData?.email}</Text>
         <Text style={{ fontSize: 16, marginTop: 10 }}>Account Created {dayjs(userData?._creationTime).fromNow()}.</Text>
         <Text style={{ fontSize: 18, marginTop: 10 }}>{userData?.phone}</Text>
         <Text style={{ fontSize: 18, marginTop: 10 }}>{userData?.address}</Text>
-        <Text style={{ fontSize: 15, fontWeight: 'bold', alignSelf:'center', marginBottom: 20, color: 'red' }}>{!userData?.role && "Have Products to Sell? Contact Admin to become a seller(linuslincom@gmail.com)\n Business and Services are subject to verification! "}</Text>
-      </>
-      
-      <>
+        {/* <Text style={{ fontSize: 15, fontWeight: 'bold', alignSelf: 'center', marginBottom: 20, color: 'red' }}>{!userData?.role && "Have Products to Sell? Contact Admin to become a seller(linuslincom@gmail.com)\n Business and Services are subject to verification! "}</Text> */}
         <Text style={{ fontSize: 24, fontWeight: 'bold' }}>Update Profile</Text>
         <TextInput
         style={{ borderWidth: 1, borderColor: 'gray', padding: 10, marginTop: 10 }}
@@ -136,6 +182,7 @@ export default function Profile() {
           }} />
       </>
       
+      </>
     </View>
   )
 }

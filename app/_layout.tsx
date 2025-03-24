@@ -61,7 +61,7 @@ export default function RootLayout() {
           }}
           >
           <Stack.Screen name="index" options={{ 
-            title: 'Shops',
+            title: 'Shop',
             headerLeft: () => 
               <Unauthenticated>
                 <Link href={"/login"} asChild>
@@ -72,6 +72,12 @@ export default function RootLayout() {
               </Unauthenticated>
           }} />
           <Stack.Screen name="product/[id]" options={{ title: 'Product' }} />
+          <Stack.Screen name="(auth)/login" options={{ title: 'Login' }} />
+          <Stack.Screen name="(user)/profile" options={{ title: 'Profile' }} />
+          <Stack.Screen name="(user)/orders" options={{ title: 'Orders' }} />
+          <Stack.Screen name="(seller)/view-products" options={{ title: 'View Product' }} />
+          <Stack.Screen name="(seller)/add" options={{ title: 'View Product' }} />
+          <Stack.Screen name="cart" options={{ title: 'Cart' }} />
         </Stack>
         
         <Authenticated>

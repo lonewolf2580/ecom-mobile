@@ -15,6 +15,8 @@ const schema = defineSchema({
     role: v.optional(v.string()),
     address: v.optional(v.string()),
     about: v.optional(v.string()),
+    deliveryWithinState: v.optional(v.number()),
+    deliveryOtherStates: v.optional(v.number()),
     // cart: v.optional(v.array(v.object({
     //     productId: v.string(),
     //     name: v.string(),
@@ -25,13 +27,20 @@ const schema = defineSchema({
   }).index("email", ["email"]),
   orders: defineTable({
     user: v.string(),
+    deliveryAddress: v.string(),
     products: v.array(v.object({
-        productId: v.string(),
+        _id: v.string(),
         name: v.string(),
         quantity: v.number(),
         price: v.number(),
         seller: v.string()
-    }))
+    })),
+    total: v.number(),
+    vat: v.number(),
+    deliveryFee: v.number(),
+    paid: v.optional(v.boolean()),
+    paidSeller: v.optional(v.boolean()),
+    status: v.optional(v.string())
   }).index('user', ['user']),
   products: defineTable({
     name: v.string(),

@@ -1,10 +1,13 @@
 import { View, Text, TextInput } from 'react-native'
 import React, { HTMLInputTypeAttribute, useEffect, useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { Button, ButtonText } from '@/components/ui/button'
 import { useMutation, useQuery } from "convex/react";
 import { api } from '@/convex/_generated/api';
 import { ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import * as ImagePicker from 'expo-image-picker';
+import { Icon } from '@/components/ui/icon';
+import { Camera } from 'lucide-react-native';
 
 export default function Add() {
   const [name, setName] = useState('')
@@ -19,6 +22,44 @@ export default function Add() {
   const userData = useQuery(api.userFunctions.currentUser);
   const addNewProduct = useMutation(api.userFunctions.createProduct);
   const generateUploadUrl = useMutation(api.userFunctions.generateUploadUrl);
+
+
+  const pickImageAsync = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      allowsEditing: true,
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      // setImage(result.assets[0].uri);
+      console.log(result.assets[0]);
+      setUploading(true)
+      const file = result.assets[0]
+      
+      if (file) {
+        // Upload Image
+        const postUrl = await generateUploadUrl()
+        console.log(postUrl);
+        
+        const response = await fetch(file.uri);
+        const blob = await response.blob();
+        const result = await fetch(postUrl, {
+          method: "POST",
+          headers: { "Content-Type": blob.type },
+          body: blob,
+        });
+        const { storageId } = await result.json();
+        console.log(storageId);
+        
+        setImage(storageId)
+      }
+      setUploading(false)
+      setUploaded(true)
+    } else {
+      alert('You did not select any image.');
+    }
+  }
 
   useEffect(() => {
     if (userData?.email) {
@@ -83,10 +124,17 @@ export default function Add() {
         <Text>Description</Text>
         <TextInput placeholder="Enter product description" className="border p-2.5 rounded" value={description} onChangeText={(text)=> setDescription(text)} />
       </View>
-      <View className="w-full mb-2.5">
+      {/* <View className="w-full mb-2.5">
         <Text>Image Upload</Text>
-        {/* <TextInput placeholder="Enter image URL" className="border p-2.5 rounded" /> */}
         <input type='file' onChange={uploadImage} />
+        {uploading && <ActivityIndicator  />}
+      </View> */}
+
+      <View style={{
+        alignItems: 'center',
+        margin: 0
+      }}>
+        <Button onPress={pickImageAsync} className='text-white' ><Icon className='text-white' size='xl' as={Camera}/><ButtonText>Choose a photo</ButtonText></Button>
         {uploading && <ActivityIndicator  />}
       </View>
       
